@@ -15,7 +15,6 @@ o jogador deve ser capaz de fazer sua jogada
 A partida sabe:
 – de quem é o turno
 – quando o jogo termina
-– quem venceu
 
 a partida deve ser capaz de saber de quem é o turno
 */
@@ -33,21 +32,68 @@ class Tabuleiro {
     }
 
     public HasAWinner() {
-        for( let col in this.winner ) {
-            this.cell[Number(col.valueOf())]
+        for(const combination of this.winner) {
+            const [a, b, c] = combination;
+
+            if (
+                this.cell[a] !== null &&
+                this.cell[a] === this.cell[b] &&
+                this.cell[b] === this.cell[c]
+            ) {
+                return this.cell[a];
+            }
         }
+
+        return null;
     }
 
     public MakeAplay(index: number, player: Player) {
         
-        if(this.cell[index] === null) return this.cell[index] = player;
+        if(this.cell[index] === null) {
+            this.cell[index] = player;
+        } else {
+            console.log('célula inválida!');
+        }
         
-        console.log('célula inválida!');
-        
-        this.HasAWinner();
+        const winnerPlayer = this.HasAWinner();
+
+        if(winnerPlayer !== null) {
+            return winnerPlayer;
+        }
+
+        return null; 
     }
 }
 
 class Partida {
+    private tabuleiro;
+    private player:Player;
+    private finished: boolean
 
+    constructor() {
+        this.tabuleiro = new Tabuleiro();
+        this.player = "X";
+        this.finished = false;
+
+    }
+
+    public play(index:number) {
+        if(this.finished === true) {
+            return console.log("jogo finalizado!");
+        }
+
+        const winner = this.tabuleiro.MakeAplay(index, this.player)
+
+        if(winner !== null) {
+            console.log("jogador: " + winner + "venceu o jogo") ;
+            this.finished = true;
+            return
+        };
+
+        this.nextPlayer();
+    };
+
+    private nextPlayer() {
+        this.player = this.player === "X" ? "O" : "X";
+    }
 }
